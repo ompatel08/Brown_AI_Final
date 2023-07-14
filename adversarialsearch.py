@@ -1,5 +1,5 @@
 from typing import Callable
-
+import adversarialsearchproblem
 from adversarialsearchproblem import (
     Action,
     AdversarialSearchProblem,
@@ -8,6 +8,47 @@ from adversarialsearchproblem import (
 
 
 def minimax(asp: AdversarialSearchProblem[GameState, Action]) -> Action:
+    state = asp.get_start_state()
+    player = state.player_to_move()
+    bestMove = None
+    bestVal = float('-inf')
+    
+    for a in asp.get_available_actions(state):
+        next_state = asp.transition(state, a)
+        val = min_helper(asp, next_state, player)
+        if val > bestVal:
+            bestVal = val
+            bestMove = a
+    return bestMove
+    
+    
+def max_helper(asp, state, player):
+    v = float('-inf')
+    
+    
+    if asp.is_terminal_state(state):
+        return asp.evaluate_terminal(state)[player]
+    
+    
+    for a in asp.get_available_actions(state):
+        next_state = asp.transition(state, a)
+        v = max(v, min_helper(asp, next_state, player))
+    return v
+    
+
+def min_helper(asp, state, player):
+    v = float('inf')
+    
+    
+    if asp.is_terminal_state(state):
+        return asp.evaluate_terminal(state)[player]
+    
+    
+    for a in asp.get_available_actions(state):
+        next_state = asp.transition(state, a)
+        v = min(v, max_helper(asp, next_state, player))
+    return v
+    
     """
     Implement the minimax algorithm on ASPs, assuming that the given game is
     both 2-player and constant-sum.
@@ -17,7 +58,7 @@ def minimax(asp: AdversarialSearchProblem[GameState, Action]) -> Action:
     Output:
         an action (an element of asp.get_available_actions(asp.get_start_state()))
     """
-    ...
+    # ...
 
 
 def alpha_beta(asp: AdversarialSearchProblem[GameState, Action]) -> Action:
